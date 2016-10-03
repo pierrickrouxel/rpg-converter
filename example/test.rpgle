@@ -12,7 +12,7 @@ DCL-S outputLength INT(10) INZ(0);
 
 DCL-S ascii CHAR(1) BASED(output);
 
-DCL-S display CHAR(20) INZ('This value should be equal to ''a'': ');
+DCL-S display CHAR(50) INZ('This value should be equal to ''a'': ');
 DCL-S returnValue INT(10) INZ(0);
 
 input = %ADDR(ebcdic);

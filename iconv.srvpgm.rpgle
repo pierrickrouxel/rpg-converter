@@ -1,5 +1,5 @@
 **free
-CTL-OPT DFTACTGRP(*NO);
+CTL-OPT NOMAIN;
 
 DCL-DS fromCode QUALIFIED;
   wordIbmccsid CHAR(8) INZ('IBMCCSID');
