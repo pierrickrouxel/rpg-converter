@@ -18,6 +18,6 @@ system_with_exit "CRTBNDDIR BNDDIR(*CURLIB/ICONV)"
 system_with_exit "ADDBNDDIRE BNDDIR(*CURLIB/ICONV) OBJ((ICONV *SRVPGM))"
 
 # Test
-system_with_exit "CRTBNDRPG PGM(*CURLIB/TSTICONV) SRCSTMF('example/test.rpgle') TGTRLS(*CURRENT) DBGVIEW(*SOURCE)"
+system_with_exit "CRTBNDRPG PGM(*CURLIB/TSTICONV) SRCSTMF('example/tsticonv.rpgle') TGTRLS(*CURRENT) DBGVIEW(*SOURCE)"
 
 echo "ICONV is built with success"

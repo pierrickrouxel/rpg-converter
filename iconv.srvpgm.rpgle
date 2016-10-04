@@ -1,78 +1,70 @@
 **free
-CTL-OPT NOMAIN;
-
-DCL-DS fromCode QUALIFIED;
-  wordIbmccsid CHAR(8) INZ('IBMCCSID');
-  ccsid CHAR(5) INZ('00000');
-  conversionAlternative CHAR(3) INZ('000');
-  substitutionAlternative CHAR(1) INZ('0');
-  shiftStateAlternative CHAR(1) INZ('0');
-  inputLengthOption CHAR(1) INZ('0');
-  mixedErrorOption CHAR(1) INZ('0');
-  reserved CHAR(12) INZ(*ALLX'00');
-END-DS;
-
-DCL-DS toCode QUALIFIED;
-  wordIbmccsid CHAR(8) INZ('IBMCCSID');
-  ccsid CHAR(5) INZ('00000');
-  reserved CHAR(19) INZ(*ALLX'00');
-END-DS;
+CTL-OPT NOMAIN
+        BNDDIR('QC2LE');
 
 DCL-DS conversionDescriptor QUALIFIED;
   returnValue INT(10) INZ(0);
   cd INT(10) DIM(12) INZ(0);
 END-DS;
 
-DCL-PR iconvOpen LIKEDS(conversionDescriptor) EXTPROC('iconv_open');
-  toCode LIKEDS(toCode);
-  fromCode LIKEDS(fromCode);
+DCL-DS conversionCode QUALIFIED;
+  ccsid INT(10) INZ(0);
+  conversionAlternative INT(10) INZ(0);
+  substitutionAlternative INT(10) INZ(0);
+  shiftStateAlternative INT(10) INZ(1);
+  inputLengthOption INT(10) INZ(0);
+  mixedErrorOption INT(10) INZ(1);
+  reserved CHAR(8) INZ(*ALLX'00');
+END-DS;
+
+DCL-PR iconvOpen LIKEDS(conversionDescriptor) EXTPROC('QtqIconvOpen');
+  to LIKEDS(conversionCode) CONST;
+  from LIKEDS(conversionCode) CONST;
 END-PR;
 
 DCL-PR iconv UNS(10) EXTPROC('iconv');
   conversionDescriptor LIKEDS(conversionDescriptor) VALUE;
-  input POINTER VALUE;
-  inputLength INT(10);
+  input POINTER;
+  inputLength UNS(10);
   output POINTER;
-  outputLength INT(10);
+  outputLength UNS(10);
 END-PR;
 
 DCL-PR iconvClose EXTPROC('iconv_close');
   conversionDescriptor LIKEDS(conversionDescriptor) VALUE;
 END-PR;
 
-DCL-S returnCode UNS(10) INZ(0);
-DCL-S error INT(10) INZ(0);
-
-DCL-C errorCode 4294967295;
+DCL-DS descriptor LIKEDS(conversionDescriptor) INZ(*LIKEDS);
+DCL-DS from LIKEDS(conversionCode) INZ(*LIKEDS);
+DCL-DS to LIKEDS(conversionCode) INZ(*LIKEDS);
 
 DCL-PROC ccsidConvert EXPORT;
   DCL-PI *N INT(10);
     input POINTER;
-    inputLength INT(10);
-    inputCcsid CHAR(5) CONST;
+    inputLength UNS(10);
+    inputCcsid INT(10);
     output POINTER;
-    outputLength INT(10);
-    outputCcsid CHAR(5) CONST;
+    outputLength UNS(10);
+    outputCcsid INT(10);
   END-PI;
 
-  // Clean parameters
-  CLEAR conversionDescriptor;
-  CLEAR fromCode;
-  CLEAR toCode;
-
   // Configure conversion
-  fromCode.ccsid = inputCcsid;
-  toCode.ccsid = outputCcsid;
+  from.ccsid = inputCcsid;
+  to.ccsid = outputCcsid;
 
-  conversionDescriptor = iconvOpen(toCode:fromCode);
+  descriptor = iconvOpen(to:from);
+  IF descriptor.returnValue = -1;
+    RETURN 1;
+  ENDIF;
 
-  returnCode = iconv(conversionDescriptor:
+  IF iconv(descriptor:
         input:inputLength:
-        output:outputLength);
+        output:outputLength) = -1;
+    RETURN 1;
+  ENDIF;
 
-  iconvClose(conversionDescriptor);
-
-  IF returnCode = errorCode;
+  iconvClose(descriptor);
+  IF descriptor.returnValue = -1;
     RETURN 1;
   ENDIF;
 
