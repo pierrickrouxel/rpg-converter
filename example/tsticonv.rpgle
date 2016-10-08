@@ -1,7 +1,7 @@
 **free
-CTL-OPT BNDDIR('PR/ICONV');
+CTL-OPT BNDDIR('CONVERTER');
 
-/copy iconv.h.rpgle
+/copy converter.h.rpgle
 
 // X'61' is 'a' in ASCII
 DCL-S ascii CHAR(1) INZ(X'61');
@@ -33,12 +33,14 @@ IF ccsidConvert(%ADDR(ascii):
                 819:
                 pointerOutput:
                 outputLength:
-                0) > 0;
+                0) < 0;
   DSPLY 'Erreur';
 ENDIF;
 
 DSPLY 'Test with pointers';
 display = 'expected pointer value ''a'', got ''' + pointerEbcdic + '''';
+DSPLY display;
+display = 'expected outputLength ''1'', got ''' + %CHAR(outputLength) + '''';
 DSPLY display;
 
 DEALLOC(N) pointerOutput;
@@ -53,12 +55,14 @@ IF ccsidConvert(%ADDR(ascii):
                 819:
                 %ADDR(variableEbcdic):
                 outputLength:
-                0) > 0;
+                0) < 0;
   DSPLY 'Erreur';
 ENDIF;
 
 DSPLY 'Test with variables';
 display = 'expected pointer value ''a'', got ''' + variableEbcdic + '''';
+DSPLY display;
+display = 'expected outputLength ''1'', got ''' + %CHAR(outputLength) + '''';
 DSPLY display;
 
 RETURN;

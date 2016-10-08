@@ -1,6 +1,5 @@
 **free
-CTL-OPT NOMAIN
-        BNDDIR('QC2LE');
+CTL-OPT NOMAIN;
 
 DCL-DS conversionDescriptor QUALIFIED;
   returnValue INT(10) INZ(0);
@@ -48,9 +47,15 @@ DCL-PROC ccsidConvert EXPORT;
     outputCcsid INT(10);
   END-PI;
   
-  // The iconv API will change the pointer address
+  // The iconv API will change values
+  DCL-S inputCopy POINTER;
+  DCL-S inputLengthCopy UNS(10);
   DCL-S outputCopy POINTER;
+  DCL-S outputLengthCopy UNS(10);
+  inputCopy = input;
+  inputLengthCopy = inputLength;
   outputCopy = output;
+  outputLengthCopy = outputLength;
 
   // Configure conversion
   from.ccsid = inputCcsid;
@@ -58,18 +63,22 @@ DCL-PROC ccsidConvert EXPORT;
 
   descriptor = iconvOpen(to:from);
   IF descriptor.returnValue = -1;
-    RETURN 1;
+    RETURN -1;
   ENDIF;
 
   IF iconv(descriptor:
-        input:inputLength:
-        outputCopy:outputLength) = -1;
-    RETURN 1;
+        inputCopy:inputLengthCopy:
+        outputCopy:outputLengthCopy) = -1;
+    RETURN -1;
   ENDIF;
+  
+  // iconv retuns a variable containing the number of the available bytes to 
+  // the end of the output buffer
+  outputLength = outputLength - outputLengthCopy;
 
   iconvClose(descriptor);
   IF descriptor.returnValue = -1;
-    RETURN 1;
+    RETURN -1;
   ENDIF;
 
   RETURN 0;
