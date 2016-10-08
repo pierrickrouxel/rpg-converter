@@ -47,6 +47,10 @@ DCL-PROC ccsidConvert EXPORT;
     outputLength UNS(10);
     outputCcsid INT(10);
   END-PI;
+  
+  // The iconv API will change the pointer address
+  DCL-S outputCopy POINTER;
+  outputCopy = output;
 
   // Configure conversion
   from.ccsid = inputCcsid;
@@ -59,7 +63,7 @@ DCL-PROC ccsidConvert EXPORT;
 
   IF iconv(descriptor:
         input:inputLength:
-        output:outputLength) = -1;
+        outputCopy:outputLength) = -1;
     RETURN 1;
   ENDIF;
 
