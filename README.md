@@ -32,6 +32,6 @@ Parameters:
  
 CCSID examples:
 
-1208 - UTF-8
-819 - ASCII
-0 - Job's CCSID
+* 1208 - UTF-8
+* 819 - ASCII
+* 0 - Job's CCSID
