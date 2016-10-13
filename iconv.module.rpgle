@@ -13,7 +13,7 @@ DCL-DS conversionCode QUALIFIED;
   shiftStateAlternative INT(10) INZ(1);
   inputLengthOption INT(10) INZ(0);
   mixedErrorOption INT(10) INZ(1);
-  reserved CHAR(8) INZ(*ALLX'00');
+  reserved CHAR(8) INZ(*LOVAL);
 END-DS;
 
 DCL-PR iconvOpen LIKEDS(conversionDescriptor) EXTPROC('QtqIconvOpen');
@@ -46,7 +46,7 @@ DCL-PROC ccsidConvert EXPORT;
     outputLength UNS(10);
     outputCcsid INT(10);
   END-PI;
-  
+
   // The iconv API will change values
   DCL-S inputCopy POINTER;
   DCL-S inputLengthCopy UNS(10);
@@ -71,8 +71,8 @@ DCL-PROC ccsidConvert EXPORT;
         outputCopy:outputLengthCopy) = -1;
     RETURN -1;
   ENDIF;
-  
-  // iconv retuns a variable containing the number of the available bytes to 
+
+  // iconv retuns a variable containing the number of the available bytes to
   // the end of the output buffer
   outputLength = outputLength - outputLengthCopy;
 
